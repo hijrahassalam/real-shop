@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Schedule daily sales report at 8:00 AM
-Schedule::command('report:daily-sales')->dailyAt('08:00');
+// Schedule daily sales report in the evening (8:00 PM Server Time)
+Schedule::command('report:daily-sales')->dailyAt('20:00');
