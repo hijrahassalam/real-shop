@@ -127,6 +127,7 @@ Visit: [http://localhost:8000](http://localhost:8000)
 * Implemented as an Artisan command:
   `php artisan report:daily-sales`
 * **Scheduled to run daily in the evening (20:00 server time)**
+* *Scheduled time is based on the application server timezone.*
 * Includes:
 
   * Order summary
@@ -174,6 +175,12 @@ php artisan report:daily-sales --date=2026-01-07
 
   * Livewire is used to minimize frontend complexity while still providing a reactive user experience.
   * This keeps the focus on backend logic, data integrity, and Laravel best practices.
+
+---
+
+## Scope Notes
+
+This project focuses on core e-commerce flows required for the technical assessment. Advanced features such as payment gateway integration, refunds, and inventory reservations are intentionally omitted to keep the scope concise and reviewable.
 
 ---
 
