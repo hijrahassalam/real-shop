@@ -1,59 +1,195 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Real Shop - E-Commerce Shopping Cart
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple e-commerce shopping cart application built with Laravel 12 and Livewire 3.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🛒 **Shopping Cart** - Add products, update quantities, remove items
+- 📦 **Product Catalog** - Browse products with search and pagination
+- �� **Checkout** - Simple checkout flow with order creation
+- 📉 **Low Stock Alerts** - Automatic email notifications when stock runs low (via Queue)
+- 📊 **Daily Sales Report** - Scheduled command for daily sales summary email
+- 🔐 **Authentication** - User registration and login with Laravel Breeze
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Framework:** Laravel 12
+- **Frontend:** Livewire 3 + Tailwind CSS
+- **Database:** MySQL
+- **Queue:** Database driver
+- **Mail:** SMTP (Mailtrap for development)
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.2+
+- Composer
+- MySQL 8.0+
+- Node.js 18+
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+\`\`\`bash
+# Clone repository
+git clone https://github.com/hijrahassalam/real-shop.git
+cd real-shop
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Install dependencies
+composer install
+npm install
 
-### Premium Partners
+# Environment setup
+cp .env.example .env
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Configure database in .env
+DB_DATABASE=db_real_shop
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 
-## Contributing
+# Run migrations and seed
+php artisan migrate --seed
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Build assets
+npm run build
+\`\`\`
 
-## Code of Conduct
+## Running the Application
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+\`\`\`bash
+# Terminal 1 - Web Server
+php artisan serve
 
-## Security Vulnerabilities
+# Terminal 2 - Queue Worker (for notifications)
+php artisan queue:work
+\`\`\`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Visit http://localhost:8000
+
+### Test Accounts
+
+| Email | Password | Role |
+|-------|----------|------|
+| admin@example.com | password | Admin |
+| test@example.com | password | User |
+
+## Key Features Explained
+
+### 1. Shopping Cart
+- Guest users redirected to login
+- Authenticated users can add products to cart
+- Real-time cart updates with Livewire
+- Stock validation before checkout
+
+### 2. Low Stock Notification
+- Uses Eloquent Observer pattern
+- Triggered when stock drops below threshold (default: 5)
+- Queued job for async email delivery
+- Configurable admin email via \`MAIL_ADMIN_ADDRESS\`
+
+\`\`\`php
+// Triggered automatically when stock falls below threshold
+// See: app/Observers/ProductObserver.php
+\`\`\`
+
+### 3. Daily Sales Report
+- Artisan command: \`php artisan report:daily-sales\`
+- Scheduled to run daily at 08:00 AM
+- Includes order summary, top products, order details
+
+\`\`\`bash
+# Run manually
+php artisan report:daily-sales
+
+# Run for specific date
+php artisan report:daily-sales --date=2026-01-07
+\`\`\`
+
+## Project Structure
+
+\`\`\`
+app/
+├── Console/Commands/
+│   └── SendDailySalesReport.php    # Daily sales report command
+├── Jobs/
+│   └── SendLowStockNotification.php # Queued notification job
+├── Livewire/
+│   ├── Cart/
+│   │   ├── CartIcon.php            # Cart icon with counter
+│   │   └── CartPage.php            # Shopping cart page
+│   ├── Checkout/
+│   │   └── CheckoutPage.php        # Checkout flow
+│   ├── Orders/
+│   │   └── OrderList.php           # Order history
+│   └── Products/
+│       └── ProductList.php         # Product catalog
+├── Mail/
+│   ├── DailySalesReport.php        # Daily report email
+│   └── LowStockAlert.php           # Low stock email
+├── Models/
+│   ├── Cart.php
+│   ├── CartItem.php
+│   ├── Order.php
+│   ├── OrderItem.php
+│   ├── Product.php
+│   └── User.php
+└── Observers/
+    └── ProductObserver.php         # Stock change observer
+\`\`\`
+
+## Environment Variables
+
+\`\`\`env
+# Mail Configuration
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+MAIL_ADMIN_ADDRESS=admin@yourcompany.com
+
+# Queue (use database for development)
+QUEUE_CONNECTION=database
+\`\`\`
+
+## Scheduler Setup (Production)
+
+Add to crontab:
+\`\`\`bash
+* * * * * cd /path/to/real-shop && php artisan schedule:run >> /dev/null 2>&1
+\`\`\`
+
+## Testing
+
+\`\`\`bash
+# Run all tests
+php artisan test
+
+# Run specific test
+php artisan test --filter=CartTest
+\`\`\`
+
+## Database Schema
+
+\`\`\`
+users
+├── id, name, email, password
+
+products
+├── id, name, description, price, stock_quantity, low_stock_threshold, image, is_active
+
+carts
+├── id, user_id
+
+cart_items
+├── id, cart_id, product_id, quantity, price
+
+orders
+├── id, user_id, order_number, status, total
+
+order_items
+├── id, order_id, product_id, quantity, price
+\`\`\`
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
