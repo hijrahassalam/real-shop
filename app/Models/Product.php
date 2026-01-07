@@ -52,6 +52,7 @@ class Product extends Model
 
     public function decrementStock(int $quantity): void
     {
-        $this->decrement('stock_quantity', $quantity);
+        $this->stock_quantity -= $quantity;
+        $this->save(); // This triggers the observer
     }
 }

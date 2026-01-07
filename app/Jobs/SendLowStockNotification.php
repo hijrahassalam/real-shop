@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Mail\LowStockAlert;
+use App\Models\Product;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class SendLowStockNotification implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(
+        public Product $product
+    ) {}
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        $adminEmail = config('mail.admin_email', 'admin@example.com');
+
+        Mail::to($adminEmail)->send(new LowStockAlert($this->product));
+
+        Log::info('Low stock notification sent', [
+            'product_id' => $this->product->id,
+            'product_name' => $this->product->name,
+            'stock_quantity' => $this->product->stock_quantity,
+            'threshold' => $this->product->low_stock_threshold,
+        ]);
+    }
+}
