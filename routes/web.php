@@ -20,4 +20,14 @@ Route::view('cart', 'cart.index')
     ->middleware(['auth'])
     ->name('cart');
 
+// Checkout - requires authentication
+Route::view('checkout', 'checkout.index')
+    ->middleware(['auth'])
+    ->name('checkout');
+
+// Orders - requires authentication
+Route::view('orders', 'orders.index')
+    ->middleware(['auth'])
+    ->name('orders');
+
 require __DIR__ . '/auth.php';

@@ -36,6 +36,11 @@ new class extends Component
                     <x-nav-link :href="route('products')" :active="request()->routeIs('products')" wire:navigate>
                         {{ __('Products') }}
                     </x-nav-link>
+                    @auth
+                        <x-nav-link :href="route('orders')" :active="request()->routeIs('orders')" wire:navigate>
+                            {{ __('My Orders') }}
+                        </x-nav-link>
+                    @endauth
                 </div>
             </div>
 
@@ -101,6 +106,9 @@ new class extends Component
             @auth
                 <x-responsive-nav-link :href="route('cart')" :active="request()->routeIs('cart')" wire:navigate>
                     {{ __('Cart') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('orders')" :active="request()->routeIs('orders')" wire:navigate>
+                    {{ __('My Orders') }}
                 </x-responsive-nav-link>
             @endauth
         </div>
