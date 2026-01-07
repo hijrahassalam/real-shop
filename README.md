@@ -1,30 +1,50 @@
-# Real Shop - E-Commerce Shopping Cart
+# Real Shop – E-Commerce Shopping Cart
 
-A simple e-commerce shopping cart application built with Laravel 12 and Livewire 3.
+A simple e-commerce shopping cart application built with **Laravel 12** and **Livewire 3**, designed to demonstrate clean architecture, user-based cart persistence, background jobs, and scheduled tasks.
+
+---
+
+## Screenshots
+
+| Product Catalog | Shopping Cart | Order History |
+|:---------------:|:-------------:|:-------------:|
+| ![Product Catalog](docs/screenshots/product-catalog.png) | ![Shopping Cart](docs/screenshots/shopping-cart.png) | ![Order History](docs/screenshots/order-history.png) |
+
+| Low Stock Email | Daily Sales Report |
+|:---------------:|:------------------:|
+| ![Low Stock Email](docs/screenshots/low-stock-email.png) | ![Daily Sales Report](docs/screenshots/daily-sales-email.png) |
+
+---
 
 ## Features
 
-- 🛒 **Shopping Cart** - Add products, update quantities, remove items
-- 📦 **Product Catalog** - Browse products with search and pagination
-- 💳 **Checkout** - Simple checkout flow with order creation
-- 📉 **Low Stock Alerts** - Automatic email notifications when stock runs low (via Queue)
-- 📊 **Daily Sales Report** - Scheduled command for daily sales summary email
-- 🔐 **Authentication** - User registration and login with Laravel Breeze
+* 🛒 **Shopping Cart** – Add products, update quantities, and remove items
+* 📦 **Product Catalog** – Browse products with search and pagination
+* 💳 **Checkout** – Simple checkout flow with order creation
+* 📉 **Low Stock Alerts** – Automatic email notifications when stock runs low (via Queue)
+* 📊 **Daily Sales Report** – Scheduled command for daily sales summary email
+* 🔐 **Authentication** – User registration and login with Laravel Breeze
+
+---
 
 ## Tech Stack
 
-- **Framework:** Laravel 12
-- **Frontend:** Livewire 3 + Tailwind CSS
-- **Database:** MySQL
-- **Queue:** Database driver
-- **Mail:** SMTP (Mailtrap for development)
+* **Framework:** Laravel 12
+* **Frontend:** Livewire 3 + Tailwind CSS
+* **Database:** MySQL
+* **Queue:** Database driver
+* **Mail:** SMTP (Mailtrap for development, `log` supported for local testing)
+
+---
 
 ## Requirements
 
-- PHP 8.2+
-- Composer
-- MySQL 8.0+
-- Node.js 18+
+* PHP 8.2+
+* Composer
+* MySQL 8.0+
+* Node.js 18+
+
+---
 
 ## Installation
 
@@ -33,7 +53,7 @@ A simple e-commerce shopping cart application built with Laravel 12 and Livewire
 git clone https://github.com/hijrahassalam/real-shop.git
 cd real-shop
 
-# Install dependencies
+# Install backend & frontend dependencies
 composer install
 npm install
 
@@ -46,45 +66,56 @@ DB_DATABASE=db_real_shop
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 
-# Run migrations and seed
+# Run migrations and seed sample data
 php artisan migrate --seed
 
-# Build assets
+# Build frontend assets
 npm run build
 ```
+
+---
 
 ## Running the Application
 
 ```bash
-# Terminal 1 - Web Server
+# Terminal 1 – Web server
 php artisan serve
 
-# Terminal 2 - Queue Worker (for notifications)
+# Terminal 2 – Queue worker (required for emails)
 php artisan queue:work
 ```
 
-Visit http://localhost:8000
+Visit: [http://localhost:8000](http://localhost:8000)
 
-### Test Accounts
+---
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@example.com | password | Admin |
-| test@example.com | password | User |
+## Test Accounts
+
+| Email                                         | Password | Role  |
+| --------------------------------------------- | -------- | ----- |
+| [admin@example.com](mailto:admin@example.com) | password | Admin |
+| [test@example.com](mailto:test@example.com)   | password | User  |
+
+> The admin account is used only as a **dummy email recipient** for
+> low stock alerts and daily sales reports.
+
+---
 
 ## Key Features Explained
 
 ### 1. Shopping Cart
-- Guest users redirected to login
-- Authenticated users can add products to cart
-- Real-time cart updates with Livewire
-- Stock validation before checkout
+
+* Guest users are redirected to login
+* Cart data is persisted in the database and associated with authenticated users
+* Real-time cart updates using Livewire
+* Stock validation is enforced before checkout
 
 ### 2. Low Stock Notification
-- Uses Eloquent Observer pattern
-- Triggered when stock drops below threshold (default: 5)
-- Queued job for async email delivery
-- Configurable admin email via `MAIL_ADMIN_ADDRESS`
+
+* Implemented using the **Eloquent Observer** pattern
+* Triggered automatically when product stock falls below a configurable threshold (default: 5)
+* Email delivery is handled asynchronously via a queued job
+* Admin email is configurable via `MAIL_ADMIN_ADDRESS`
 
 ```php
 // Triggered automatically when stock falls below threshold
@@ -92,17 +123,59 @@ Visit http://localhost:8000
 ```
 
 ### 3. Daily Sales Report
-- Artisan command: `php artisan report:daily-sales`
-- Scheduled to run daily at 08:00 AM
-- Includes order summary, top products, order details
+
+* Implemented as an Artisan command:
+  `php artisan report:daily-sales`
+* **Scheduled to run daily in the evening (20:00 server time)**
+* Includes:
+
+  * Order summary
+  * Top-selling products
+  * Order details for the selected day
 
 ```bash
 # Run manually
 php artisan report:daily-sales
 
-# Run for specific date
+# Run for a specific date
 php artisan report:daily-sales --date=2026-01-07
 ```
+
+---
+
+## Design Decisions
+
+* **Orders & Order Items**
+
+  * The `orders` and `order_items` tables are introduced to clearly define when a product is considered *sold*.
+  * This avoids ambiguity from abandoned carts and simplifies daily sales reporting.
+
+* **User-Based Cart Persistence**
+
+  * Shopping carts are stored in the database and associated with authenticated users rather than using session or local storage.
+  * This ensures consistency across devices and aligns with real-world e-commerce behavior.
+
+* **Low Stock Notification via Observer**
+
+  * An Eloquent Observer is used to decouple stock-related side effects from controllers.
+  * This guarantees that low stock alerts are triggered consistently whenever stock changes, regardless of where the update originates.
+
+* **Asynchronous Email Delivery**
+
+  * Email notifications are dispatched via queued jobs to avoid blocking critical flows such as checkout.
+  * The database queue driver is chosen for simplicity and ease of local review.
+
+* **Scheduled Daily Sales Report**
+
+  * The sales report is implemented as an Artisan command and executed via Laravel’s scheduler.
+  * This allows the report to be triggered manually for debugging or automatically in production via cron.
+
+* **Minimal Frontend Layer**
+
+  * Livewire is used to minimize frontend complexity while still providing a reactive user experience.
+  * This keeps the focus on backend logic, data integrity, and Laravel best practices.
+
+---
 
 ## Project Structure
 
@@ -124,7 +197,7 @@ app/
 │       └── ProductList.php            # Product catalog
 ├── Mail/
 │   ├── DailySalesReport.php           # Daily report email
-│   └── LowStockAlert.php              # Low stock email
+│   └── LowStockAlert.php              # Low stock alert email
 ├── Models/
 │   ├── Cart.php
 │   ├── CartItem.php
@@ -136,10 +209,12 @@ app/
     └── ProductObserver.php            # Stock change observer
 ```
 
+---
+
 ## Environment Variables
 
 ```env
-# Mail Configuration
+# Mail configuration
 MAIL_MAILER=smtp
 MAIL_HOST=sandbox.smtp.mailtrap.io
 MAIL_PORT=2525
@@ -147,18 +222,26 @@ MAIL_USERNAME=your_mailtrap_username
 MAIL_PASSWORD=your_mailtrap_password
 MAIL_ADMIN_ADDRESS=admin@yourcompany.com
 
-# Queue (use database for development)
+# Queue
 QUEUE_CONNECTION=database
 ```
 
+> For local testing, `MAIL_MAILER=log` can be used to inspect emails via
+> `storage/logs/laravel.log`.
+
+---
+
 ## Scheduler Setup (Production)
 
-Add to crontab:
+Add the following entry to crontab:
+
 ```bash
 * * * * * cd /path/to/real-shop && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-## Database Schema
+---
+
+## Database Schema (Simplified)
 
 ```
 users
@@ -179,6 +262,8 @@ orders
 order_items
 ├── id, order_id, product_id, quantity, price
 ```
+
+---
 
 ## License
 
