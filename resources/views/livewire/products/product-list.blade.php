@@ -1,4 +1,17 @@
 <div>
+    <!-- Flash Messages -->
+    @if (session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <!-- Search -->
     <div class="mb-6">
         <input
@@ -12,7 +25,7 @@
     <!-- Products Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @forelse ($products as $product)
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300" wire:key="product-{{ $product->id }}">
                 <!-- Product Image Placeholder -->
                 <div class="h-48 bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
                     <svg class="w-16 h-16 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,14 +53,21 @@
                     <!-- Add to Cart Button -->
                     @auth
                         <button
-                            wire:click="$dispatch('add-to-cart', { productId: {{ $product->id }} })"
+                            wire:click="addToCart({{ $product->id }})"
+                            wire:loading.attr="disabled"
+                            wire:target="addToCart({{ $product->id }})"
                             @disabled($product->stock_quantity <= 0)
                             class="mt-4 w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200
                                 {{ $product->stock_quantity > 0
                                     ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
                         >
-                            {{ $product->stock_quantity > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                            <span wire:loading.remove wire:target="addToCart({{ $product->id }})">
+                                {{ $product->stock_quantity > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                            </span>
+                            <span wire:loading wire:target="addToCart({{ $product->id }})">
+                                Adding...
+                            </span>
                         </button>
                     @else
                         <a

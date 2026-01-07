@@ -15,4 +15,9 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Cart - requires authentication
+Route::view('cart', 'cart.index')
+    ->middleware(['auth'])
+    ->name('cart');
+
 require __DIR__ . '/auth.php';
