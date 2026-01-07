@@ -43,7 +43,10 @@
 
                         @if ($product->stock_quantity > 0)
                             <span class="text-sm {{ $product->isLowStock() ? 'text-orange-500' : 'text-green-500' }}">
-                                {{ $product->isLowStock() ? 'Low Stock' : 'In Stock' }}
+                                {{ $product->stock_quantity }} left
+                                @if($product->isLowStock())
+                                    ⚠️
+                                @endif
                             </span>
                         @else
                             <span class="text-sm text-red-500">Out of Stock</span>
